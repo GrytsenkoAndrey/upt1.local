@@ -3,14 +3,49 @@ services:
 
   #redis
   redis:
-    image: redis:6.2.0
+    image: 'redis:6.2.0'
     container_name: "${DOCKER_PREFIX}-redis"
     restart: always
     ports:
       - "6379:6379"
     networks:
       - test_network
-
+  #mariadb
+  db:
+    image: 'mysql:8.0.15'
+    container_name: "${DOCKER_PREFIX}-db"
+    restart: always
+    ports:
+      - "30306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - ./docker/dbdata:/var/lib/mysql/
+    networks:
+      - test_network
+    healthcheck:
+       test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+       retries: 3
+       timeout: 5s
+  # adminer
+  adminer:
+    image: 'adminer'
+    restart: always
+    container_name: "${DOCKER_PREFIX}-adminer"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    links:
+      - db:db
+    depends_on:
+      - db
+    ports:
+      - 8081:8080
+    networks:
+      - test_network
   #php
   app:
     build:
@@ -34,47 +69,9 @@ services:
       - ./docker/php-fpm/local.ini:/usr/local/etc/php/conf.d/php.ini
     networks:
       - test_network
-  #mariadb
-  db:
-    image: mysql:8.0.15
-    container_name: "${DOCKER_PREFIX}-db"
-    restart: always
-    tty: true
-    command:
-        --default-authentication-plugin=mysql_native_password
-        --performance-schema --secure-file-priv=""
-    ports:
-        - "30306:3306"
-    environment:
-        MYSQL_DATABASE: ${DB_DATABASE}
-        MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-        MYSQL_USER: ${DB_USERNAME}
-        MYSQL_PASSWORD: ${DB_PASSWORD}
-        SERVICE_TAGS: dev
-        SERVICE_NAME: mysql
-    volumes:
-        - ./docker/db-data:/var/lib/mysql/
-        - ./docker/mysql/my.cnf:/etc/mysql/my.cnf
-    networks:
-      - test_network
-  # adminer
-  adminer:
-    image: adminer
-    restart: always
-    container_name: "${DOCKER_PREFIX}-adminer"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-    links:
-      - db:db
-    depends_on:
-      - db
-    ports:
-      - 8081:8080
-    networks:
-      - test_network
   #nginx
   webserver:
-    image: nginx:1.19.7-alpine
+    image: 'nginx:1.19.7-alpine'
     container_name: "${DOCKER_PREFIX}-server"
     restart: always
     tty: true
