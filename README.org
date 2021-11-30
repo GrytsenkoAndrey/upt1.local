@@ -1,0 +1,15 @@
+#+TITLE: Laravel Test Task
+
++ Init git repo before starting, and do changes as a branch. After complete tasks, merge into master.
++ Change php memory_limit to 1G
++ add adminer to docker compose
++ add laravel echo server to docker compose
++ setup websockets on laravel
++ create a task form with following fields:
+  - Name
+  - Description
+  - Date
++ add validation
++ save data to db
++ show added tasks above form
++ update tasks for all users viewing the page in realtime using websockets.

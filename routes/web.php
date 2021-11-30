@@ -16,3 +16,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::resource('task', App\Http\Controllers\TaskController::class)->except(['index', 'destroy']);
