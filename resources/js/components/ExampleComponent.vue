@@ -27,7 +27,7 @@ export default {
             .listen('.App\\Events\\TaskUpdatedEvent' ,(e) => {
                 this.show = true;
                 this.message = e.message;
-                this.$toaster.success(this.message);
+                this.$toaster.success("One task was changed!");
                 setTimeout(() => {
                     this.message = '';
                     if (this.task_id == e.task_id) {
