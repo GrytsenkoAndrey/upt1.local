@@ -18,3 +18,9 @@ Route::get('/', function () {
 });
 
 Route::resource('task', App\Http\Controllers\TaskController::class)->except(['index', 'destroy']);
+
+Route::get('test', function () {
+    #event(new \App\Events\TaskUpdatedEvent('test', 13));
+
+
+});

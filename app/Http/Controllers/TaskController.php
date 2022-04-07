@@ -71,6 +71,8 @@ class TaskController extends Controller
     {
         $task->update($request->validated());
 
+        event(new TaskUpdatedEvent('The task "' . $task->name . '" was updated! If you look this - don\'t worry - page will be reload', $task->id));
+
         return redirect()->route('task.create');
     }
 }
